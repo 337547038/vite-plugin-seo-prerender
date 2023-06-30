@@ -1,0 +1,53 @@
+{
+  "name": "vite-plugin-seo-prerender",
+  "version": "0.0.1",
+  "description": "`vite-plugin-seo-prerender` 插件是一个用于 `Vite` 构建工具的预渲染插件，它可以将你的单页面应用 (SPA) 在构建时静态预渲染为 HTML 文件，以提高首次加载速度和SEO友好性。适用于对站点少量页面生成静态HTML。支持 `Vue、React`等所有框架",
+  "license": "MIT",
+  "author": "337547038",
+  "keywords": [
+    "prerender",
+    "seo",
+    "puppeteer",
+    "vue3",
+    "react",
+    "vite"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/337547038/vite-plugin-seo-prerender.git",
+    "directory": "packages"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "bugs": {
+    "url": "https://github.com/337547038/vite-plugin-seo-prerender/issues"
+  },
+  "homepage": "https://github.com/337547038/vite-plugin-seo-prerender",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "tsup": "tsup"
+  },
+  "dependencies": {
+    "puppeteer": "^20.7.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.5",
+    "typescript": "^5.0.2"
+  }
+}
