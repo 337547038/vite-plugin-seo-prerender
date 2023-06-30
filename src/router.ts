@@ -26,7 +26,7 @@ const router = createRouter({
   routes: routes
 })
 
-router.afterEach((to, from, next) => {
+router.afterEach((to) => {
   const {title, keywords, description} = to.meta;
   if (title) {
     document.title = title;
@@ -43,6 +43,5 @@ router.afterEach((to, from, next) => {
       metaDescription.content = description;
     }
   }
-  next()
 })
 export default router

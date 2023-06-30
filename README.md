@@ -48,7 +48,7 @@ export default defineConfig({
 
 运行 `vite build` 构建命令时即可生成HTML 文件
 
-## 附seo关键词优化
+## 附：seo关键词优化设置
 
 ```ts
 // router.ts

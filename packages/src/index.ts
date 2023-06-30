@@ -29,19 +29,15 @@ const prerender = (config: Config) => {
       //console.log('buildEnd')
     },
     configureServer(server) {
+      console.log('is build')
       const {watcher} = server
       if (config.htmlRoutes?.length) {
-        // 监听 public 目录下的 HTML 文件更改
         watcher.on('change', (filePath) => {
-          const publicRoot = path.join(server.config.root, '/public')
-          const relativePath = path.relative(publicRoot, filePath)
-          console.log('relativePath', relativePath)
-          /*if (filePath.startsWith(server.config.root + '/public/') && filePath.endsWith('.html')) {
-            console.log(`Detected change in HTML file: ${filePath}`);
-
-            // 在此处进行你的处理逻辑
-            // 可以读取文件内容、替换内容、编译等操作
-          }*/
+          const relativePath = path.relative(server.config.root, filePath).replace('public', '').replace(/\\/g,'/')
+          if (config.htmlRoutes.includes(relativePath)) {
+            // 监听 public 目录下的 HTML 文件更改
+            console.log('server',server)
+          }
         })
       }
     },

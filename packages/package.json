@@ -10,7 +10,9 @@
     "puppeteer",
     "vue3",
     "react",
-    "vite"
+    "vite",
+    "预渲染",
+    "seo优化"
   ],
   "repository": {
     "type": "git",
