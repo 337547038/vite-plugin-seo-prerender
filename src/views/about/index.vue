@@ -1,7 +1,7 @@
 <template>
-  <div>this about page</div>
+  <div class="about">this about page</div>
 </template>
 
-<style scoped>
-
+<style>
+.about{color: red;font-size: 16px;}
 </style>

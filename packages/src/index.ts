@@ -1,11 +1,13 @@
 import seoPrerender from './render'
 import childProcess from 'child_process'
+import path from 'path'
 
 interface Config {
   puppeteer?: any // puppeteer一些配置
-  routes: string[] // 需要生成的路由地址
+  routes?: string[] // 需要生成的路由地址
   removeStyle?: boolean // 启用vite preview会自带有些样式，默认下移除
   callback?: Function
+  htmlRoutes?: string[] // 处理public目录下的html文件
 }
 
 const prerender = (config: Config) => {
@@ -25,6 +27,23 @@ const prerender = (config: Config) => {
     },
     buildEnd() {
       //console.log('buildEnd')
+    },
+    configureServer(server) {
+      const {watcher} = server
+      if (config.htmlRoutes?.length) {
+        // 监听 public 目录下的 HTML 文件更改
+        watcher.on('change', (filePath) => {
+          const publicRoot = path.join(server.config.root, '/public')
+          const relativePath = path.relative(publicRoot, filePath)
+          console.log('relativePath', relativePath)
+          /*if (filePath.startsWith(server.config.root + '/public/') && filePath.endsWith('.html')) {
+            console.log(`Detected change in HTML file: ${filePath}`);
+
+            // 在此处进行你的处理逻辑
+            // 可以读取文件内容、替换内容、编译等操作
+          }*/
+        })
+      }
     },
     closeBundle() {
       if (!config?.routes?.length) {

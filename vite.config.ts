@@ -7,6 +7,9 @@ import seoPrerender from './packages/src'
 export default defineConfig({
   plugins: [
     vue(),
-    seoPrerender({routes: ['/about']})
+    seoPrerender({
+      routes: ['/about'],
+      htmlRoutes: ['/contact/index.html']
+    })
   ]
 })
