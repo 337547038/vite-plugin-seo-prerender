@@ -7,5 +7,5 @@
 
 </script>
 <style>
-.index{color: antiquewhite}
+.index{color: antiquewhite;font-size: 16px}
 </style>

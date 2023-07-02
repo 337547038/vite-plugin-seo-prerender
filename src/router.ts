@@ -21,7 +21,7 @@ const routes = [
 // console.log(routes)
 // 配置路由
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   //history: createWebHashHistory(),
   routes: routes
 })
