@@ -11,7 +11,7 @@ const seoPrerender = async (config) => {
   for (const item of config.routes) {
     await page.goto(path.join(config.local, item))
     await page.setViewport({width: 1024, height: 768})
-    let content = await page.content()
+    let content: string = await page.content()
     if (config.removeStyle !== false) {
       // 若出现导常，可设置参数removeStyle:false
       content = content.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "");

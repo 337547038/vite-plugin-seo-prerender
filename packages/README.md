@@ -70,9 +70,9 @@ html页时，可实现热更新。
 | removeStyle | boolean             | 移除预览服务生成多余样式，默认true。如样式丢失，可设置为false                                     |
 | callback    | funtion(html,route) | 预渲染和处理public下.html文件处理回调事件，可对需处理的页面进行修改，html为将要生成的文件内容,route当前处理的页面path |
 | publicHtml  | boolean/string[]    | 需要处理的纯静态文件。true代表public整个目录下的html文件，数组时可指定文件，如['/contact/index.html']   |
-| scss        | [{entry,outDir}]    | 需要编辑的单独scss文件。专为单独纯html定制，可将独立(即没有项目里引入)的scss转换为css                     |
+| scss        | [{entry,outDir}]    | 需要编辑的单独scss文件。专为单独纯html定制，可将独立(即没有在项目里引入)的scss转换为css                    |
 
-## 附：seo关键词优化设置
+## 附：seo关键词优化路由设置
 
 ```ts
 // router.ts
