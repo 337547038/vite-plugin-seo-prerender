@@ -1,15 +1,52 @@
 import childProcess from 'child_process'
 import path from 'path'
-import seoPrerender from './render'
-import publicHtml from "./public"
-import {Config} from "./types"
-import {createServer} from 'vite';
 import fs from 'fs'
-import puppeteer from 'puppeteer'
+import * as sass from 'sass'
+import prerender from './render'
 
+// @ts-ignore
+import publicHtml from './public'
+import {getTransform, recursiveMkdir} from './utils'
 
-let pPage
-const prerender = (config: Config) => {
+interface Scss {
+  entry: string
+  outDir: string
+}
+
+export interface Config {
+  puppeteer?: any // puppeteer一些配置
+  routes?: string[] // 需要生成的路由地址
+  removeStyle?: boolean // 启用vite preview会自带有些样式，默认下移除
+  callback?: Function
+  publicHtml?: boolean | string[] // public目录html文件处理
+  scss?: Scss[]
+}
+
+const getPublicHtml = (publicHtml) => {
+  let allUrl: string[] = []
+  if (typeof publicHtml === 'object') {
+    // 处理指定的
+    allUrl = publicHtml || []
+  }
+  const isAllUrl: boolean = typeof publicHtml === 'boolean' && publicHtml
+  return {allUrl, isAllUrl}
+}
+
+/**
+ * 将scss转换为css
+ * @param root
+ * @param css
+ */
+const transformSass = (root: string, css: Scss) => {
+  const entryDir: string = path.join(root, css.entry)
+  const result = sass.compile(entryDir)
+  const outDir: string = path.join(root, css.outDir)
+  recursiveMkdir(path.dirname(outDir))
+  fs.writeFileSync(outDir, result.css)
+  console.log(`transform scss: ${css.entry} => ${css.outDir}`)
+}
+
+const seoPrerender = (config: Config) => {
   const cfgConfig = {
     outDir: '',
     mode: '',
@@ -26,101 +63,78 @@ const prerender = (config: Config) => {
       cfgConfig.root = cfg.root
       cfgConfig.base = cfg.base
     },
-    async buildStart() {
-
-    },
-    buildEnd() {
-      console.log('buildEnd，没看到有触发')
-    },
-    async load(id) {
-    },
-    transform(code, id) {
-      /*if (id.endsWith('.html')) {
-        console.log('transform:',id)
-      }*/
-    },
-    /*transformIndexHtml(html, tag) {
-      //console.log('transform',html)
-    },*/
-    transformIndexHtml: {
-      async transform(html, ctx) {
-        console.log('transform')
-        //console.log('html',html)
-        //console.log('ctx',ctx)
-        //ctx.moduleGraph.transformIndexHtml(html=>{})
-
-      }
-    },
-    async handleHotUpdate({file, server}) {
-      if (file.endsWith('.html')) {
-        /*console.log('file:',server)
-        // 启动一个浏览器服务
-        if (!pPage) {
-          const browser = await puppeteer.launch(Object.assign({headless: 'new'}, config.puppeteer || {}));
-          pPage = await browser.newPage()
-          await pPage.goto('http://127.0.0.1:5173')
-          await pPage.setViewport({width: 1024, height: 768})
-        }
-        pPage.content()
-          .then(html => {
-            console.log('page content', html)
-          })
-          .catch(res => {
-            console.log('catch', res)
-          })*/
+    buildStart() {
+      if (config?.scss?.length) {
+        config.scss.forEach((item: Scss) => {
+          transformSass(cfgConfig.root, item)
+        })
       }
     },
     configureServer(server) {
-      if (config.html?.routes?.length) {
-        server.middlewares.use((req, res, next) => {
-          //  console.log(server.moduleGraph)
+      const {allUrl, isAllUrl} = getPublicHtml(config?.publicHtml)
+      if (allUrl.length || isAllUrl) {
+        server.middlewares.use(async (req, res, next) => {
           const baseUrl = req.url.replace(cfgConfig.base, '/')
-          console.log('base',baseUrl)
-          if (config.html.routes.includes(baseUrl)) {
-            console.log(req.url)
-            const module = server.moduleGraph.getModuleByUrl(req.url)
-              .then(res => {
-                console.log(res, 'okk')
-              })
-
-            const htmlContent = module ? module.content : '';
-            res.setHeader('Content-Type', 'text/html')
-            res.end('12');
-            return;
+          if ((isAllUrl && baseUrl.endsWith('.html')) || allUrl.includes(baseUrl)) {
+            const htmlContent: string = await publicHtml({
+              root: cfgConfig.root,
+              filePath: baseUrl,
+              mode: 'server',
+              callback: config.callback
+            })
+            if (htmlContent) {
+              res.setHeader('Content-Type', 'text/html')
+              res.end(htmlContent)
+              return
+            }
           }
           next()
         })
       }
-      // console.log('configureServer')
-      //const {watcher} = server
-      /*if (config.htmlRoutes?.length) {
-        watcher.on('change', async (filePath) => {
-          const relativePath = path.relative(server.config.root, filePath).replace('public', '').replace(/\\/g, '/')
-          if (config.htmlRoutes.includes(relativePath)) {
-            // 监听 public 目录下的指定　HTML 文件更改
-            let hostPort = '' // 获取启用的服务ip地址端口
-            const resolvedUrls = server.resolvedUrls
-            for (const key in resolvedUrls) {
-              if (resolvedUrls[key].length) {
-                hostPort = resolvedUrls[key][0]
-              }
-            }
-            await publicHtml(Object.assign(config,
-              {hostPort: hostPort, filePath: filePath}), 'dev')
+    },
+    handleHotUpdate({file, server}) {
+      // 更新时刷新当前页面
+      if (file.endsWith('.html')) {
+        const {allUrl, isAllUrl} = getPublicHtml(config?.publicHtml)
+        if (isAllUrl || allUrl.length) {
+          const publicPath = path.join(cfgConfig.root, 'public')
+          const dirPath = path.relative(publicPath, file)
+          server.ws.send({
+            type: 'full-reload',
+            path: '/' + getTransform(dirPath)
+          })
+        }
+      }
+      if (config?.scss?.length && file.endsWith('.scss')) {
+        const fileDir: string = getTransform(file)
+        config.scss.forEach((item: Scss) => {
+          if (fileDir.includes(item.entry)) {
+            transformSass(cfgConfig.root, item)
           }
         })
-      }*/
-    },
-    closeBundle() {
-      if (!config?.routes?.length) {
-        console.log('路由地址为空，请配置需预渲染的routes')
-        return
       }
+    },
+    async closeBundle() {
       // vite build 构建生产环境时才执行
       if (cfgConfig.mode !== 'production') {
         return
       }
-      console.log('[vite-plugin-seo-prerender] is start..')
+      // 处理public下的html
+      const {allUrl, isAllUrl} = getPublicHtml(config?.publicHtml)
+      if (isAllUrl || allUrl.length) {
+        await publicHtml({
+          root: cfgConfig.root,
+          filePath: isAllUrl || allUrl,
+          mode: 'build',
+          outDir: cfgConfig.outDir,
+          callback: config.callback
+        })
+      }
+      if (!config?.routes?.length) {
+        //console.log('路由地址为空，请配置需预渲染的routes')
+        return
+      }
+      console.log('[vite-plugin-seo-prerender:routes] is start..')
       const cProcess = childProcess.exec('vite preview', (err) => {
         if (err) {
           console.error('执行命令时发生错误：', err);
@@ -135,7 +149,7 @@ const prerender = (config: Config) => {
           localUrl = local[0].replace(/\x1B\[\d+m/g, '').slice(0, -1) // 控制台输出的有些会经过转义
           console.log('Local: ' + localUrl)
           cfgConfig.local = localUrl
-          await seoPrerender(Object.assign(config, cfgConfig))
+          await prerender(Object.assign(config, cfgConfig))
           // 在某个条件满足时，关闭进程退出
           cProcess.kill('SIGTERM')
           process.exit() // 关闭当前进程并退出
@@ -145,6 +159,7 @@ const prerender = (config: Config) => {
     }
   }
 }
-export default prerender
+
+export default seoPrerender
 
 
