@@ -7,9 +7,13 @@ import seoPrerender from 'vite-plugin-seo-prerender'
 export default defineConfig({
   plugins: [
     vue(),
+    // @ts-ignore
     seoPrerender({
       routes: ['/about'],
-      publishHtml: ['/contact/index.html']
+      publicHtml: true,
+      scss: [
+        {entry: '/src/assets/test.scss', outDir: '/public/style/test.css'}
+      ]
     })
   ]
 })
