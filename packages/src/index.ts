@@ -74,7 +74,7 @@ const seoPrerender = (config: Config) => {
       const {allUrl, isAllUrl} = getPublicHtml(config?.publicHtml)
       if (allUrl.length || isAllUrl) {
         server.middlewares.use(async (req, res, next) => {
-          const baseUrl = req.url.replace(cfgConfig.base, '/')
+          const baseUrl = decodeURIComponent(req.url.replace(cfgConfig.base, '/'))
           if ((isAllUrl && baseUrl.endsWith('.html')) || allUrl.includes(baseUrl)) {
             const htmlContent: string = await publicHtml({
               root: cfgConfig.root,

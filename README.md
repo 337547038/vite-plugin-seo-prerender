@@ -39,11 +39,11 @@ export default defineConfig({
 
 ## 纯静态开发
 
-*使用预渲染生成的html页面有一个弊端，如预渲染生成页面 `/about/index.html`，它并不能通过 `http://xxx.com/about/index.html`
-这样的形式正常访问，即使能正常展示也会丢失脚本事件*
+**使用预渲染生成的html页面有一个弊端，如预渲染生成页面 `/about/index.html`，它并不能通过 `http://xxx.com/about/index.html`
+这样的形式正常访问，即使能正常展示也会丢失脚本事件**
 
 对于部分特殊需求需要纯静态页面时，插件同样支持在编写 `public` 目录下的 `.html`
-文件时，同样支持热更新及引入项目由 `scss、less`等编写的公共样式。并可使用指定标签替换页面内容，如公共头尾部等。
+文件时，同样支持热更新及引入项目由 `scss、less`等编写的公共样式。并可使用指定标签替换页面内容，如公共头尾部等。只需简单配置`publicHtml`即可
 
 ```html
  <!--/public/about/index.html-->
@@ -54,8 +54,7 @@ export default defineConfig({
 </body>
 ```
 
-在浏览器输入如 `http://localhost/contact/index.html` 即可看到被替换后的页面，当修改`scss/less`文件或当前
-html页时，可实现热更新。
+在浏览器输入如 `http://localhost/contact/index.html` 即可看到被替换后的页面，当修改`scss/less`文件或当前 html 页改变时，可实现热更新。
 
 ## 发布
 
@@ -70,7 +69,8 @@ html页时，可实现热更新。
 | removeStyle | boolean             | 移除预览服务生成多余样式，默认true。如样式丢失，可设置为false                                     |
 | callback    | funtion(html,route) | 预渲染和处理public下.html文件处理回调事件，可对需处理的页面进行修改，html为将要生成的文件内容,route当前处理的页面path |
 | publicHtml  | boolean/string[]    | 需要处理的纯静态文件。true代表public整个目录下的html文件，数组时可指定文件，如['/contact/index.html']   |
-| scss        | [{entry,outDir}]    | 需要编辑的单独scss文件。专为单独纯html定制，可将独立(即没有在项目里引入)的scss转换为css                    |
+| scss        | [{entry,outDir}]    | 需要编译的单独scss文件。专为单独纯html页面量身定制，可将独立(即没有在项目里引入)的scss转换为css                |
+
 
 ## 附：seo关键词优化路由设置
 
@@ -89,7 +89,7 @@ const routes = [
   }
 ]
 
-router.afterEach((to, from, next) => {
+router.afterEach((to) => {
   const {title, keywords, description} = to.meta
   if (title) {
     document.title = title
@@ -106,6 +106,5 @@ router.afterEach((to, from, next) => {
       metaDescription.content = description
     }
   }
-  next()
 })
 ```

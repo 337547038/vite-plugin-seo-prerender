@@ -19,7 +19,7 @@ let scriptLink
  * 提取index.html中的入口script和link
  * @param root 项目根目录 绝对位置路径
  * @param mode 模式 server/build
- * @param outDir 打包输入目录
+ * @param outDir 打包输出目录
  */
 const getEntry = (root: string, mode: string, outDir?: string) => {
   // 从入口html页面获取
