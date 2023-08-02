@@ -4,12 +4,16 @@ import path from 'path'
 import {recursiveMkdir} from './utils'
 
 
-const seoPrerender = async (config) => {
+const seoPrerender = async (config: any) => {
   const browser = await puppeteer.launch(Object.assign({headless: 'new'}, config.puppeteer || {}));
   const page = await browser.newPage()
-  const logTip = '[vite-plugin-seo-prerender:routes]'
+  const logTip: string = '[vite-plugin-seo-prerender:routes]'
+  let network = {}
+  if (config.network) {
+    network = {waitUntil: 'networkidle0'} // 等待所有请求结束
+  }
   for (const item of config.routes) {
-    await page.goto(path.join(config.local, item))
+    await page.goto(path.join(config.local, item), network)
     await page.setViewport({width: 1024, height: 768})
     let content: string = await page.content()
     if (config.removeStyle !== false) {

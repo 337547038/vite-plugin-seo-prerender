@@ -14,7 +14,7 @@ interface PublicConfig {
   callback?: Function
 }
 
-let scriptLink
+let scriptLink: string = ''
 /**
  * 提取index.html中的入口script和link
  * @param root 项目根目录 绝对位置路径
@@ -35,7 +35,7 @@ const getEntry = (root: string, mode: string, outDir?: string) => {
     //const linkPattern = /(?<=<link.*?href=["'])(.*?\.css)(?=["'].*?)/g
     const links = indexContent.match(linkPattern)
     // 编译后的index.html
-    const newIndex: string = fs.readFileSync(path.join(root, outDir, 'index.html'), 'utf-8')
+    const newIndex: string = fs.readFileSync(path.join(root, outDir || '', 'index.html'), 'utf-8')
     const newLinks = newIndex.match(linkPattern) || []
     let resultLink: string[] = newLinks
     if (links) {
@@ -116,7 +116,7 @@ const findHTMLFiles = (dirPath: string, indexPath: string, root: string, callbac
  * @param config
  */
 const publicHtml = async (config: PublicConfig) => {
-  const {mode, root, filePath, outDir} = config
+  const {mode, root, filePath, outDir = ''} = config
   if (!scriptLink) { // 减少下每次读取index.html
     scriptLink = getEntry(root, mode, outDir)
   }

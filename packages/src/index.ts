@@ -22,7 +22,7 @@ export interface Config {
   scss?: Scss[]
 }
 
-const getPublicHtml = (publicHtml) => {
+const getPublicHtml = (publicHtml: boolean | string[]) => {
   let allUrl: string[] = []
   if (typeof publicHtml === 'object') {
     // 处理指定的
@@ -54,6 +54,7 @@ const seoPrerender = (config: Config) => {
     local: '',
     base: ''
   }
+  const configPublicHtml = config.publicHtml || false
   return {
     name: 'vitePluginSeoPrerender',
     enforce: 'post',
@@ -70,13 +71,13 @@ const seoPrerender = (config: Config) => {
         })
       }
     },
-    configureServer(server) {
-      const {allUrl, isAllUrl} = getPublicHtml(config?.publicHtml)
+    configureServer(server: any) {
+      const {allUrl, isAllUrl} = getPublicHtml(configPublicHtml)
       if (allUrl.length || isAllUrl) {
-        server.middlewares.use(async (req, res, next) => {
+        server.middlewares.use(async (req: any, res: any, next: any) => {
           const baseUrl = decodeURIComponent(req.url.replace(cfgConfig.base, '/'))
           if ((isAllUrl && baseUrl.endsWith('.html')) || allUrl.includes(baseUrl)) {
-            const htmlContent: string = await publicHtml({
+            const htmlContent = await publicHtml({
               root: cfgConfig.root,
               filePath: baseUrl,
               mode: 'server',
@@ -92,10 +93,10 @@ const seoPrerender = (config: Config) => {
         })
       }
     },
-    handleHotUpdate({file, server}) {
+    handleHotUpdate({file, server}: { file: string, server: any }) {
       // 更新时刷新当前页面
       if (file.endsWith('.html')) {
-        const {allUrl, isAllUrl} = getPublicHtml(config?.publicHtml)
+        const {allUrl, isAllUrl} = getPublicHtml(configPublicHtml)
         if (isAllUrl || allUrl.length) {
           const publicPath = path.join(cfgConfig.root, 'public')
           const dirPath = path.relative(publicPath, file)
@@ -120,7 +121,7 @@ const seoPrerender = (config: Config) => {
         return
       }
       // 处理public下的html
-      const {allUrl, isAllUrl} = getPublicHtml(config?.publicHtml)
+      const {allUrl, isAllUrl} = getPublicHtml(configPublicHtml)
       if (isAllUrl || allUrl.length) {
         await publicHtml({
           root: cfgConfig.root,
@@ -141,7 +142,8 @@ const seoPrerender = (config: Config) => {
           return;
         }
       })
-      let localUrl
+      let localUrl: string = ''
+      // @ts-ignore
       cProcess.stdout.on('data', async (data) => {
         const local = data.match(/http:\/\/(.*?)\//g)
         if (local && local.length && !localUrl) {
