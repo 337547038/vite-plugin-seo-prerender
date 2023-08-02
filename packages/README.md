@@ -62,15 +62,15 @@ export default defineConfig({
 
 ## API
 
-| 参数          | 类型                  | 说明                                                                      |
-|-------------|---------------------|-------------------------------------------------------------------------|
-| puppeteer   | object              | puppeteer一些配置                                                           |
-| routes      | string[]            | 生成预渲染的路由path                                                            |
-| network     | boolean             | 构建时是否获取异步数据并注入到预渲染的 HTML 文件中，默认false 。开启后构建速度相对会慢些                      |
-| removeStyle | boolean             | 移除预览服务生成多余样式，默认true。如样式丢失，可设置为false                                     |
-| callback    | funtion(html,route) | 预渲染和处理public下.html文件处理回调事件，可对需处理的页面进行修改，html为将要生成的文件内容,route当前处理的页面path |
-| publicHtml  | boolean/string[]    | 需要处理的纯静态文件。true代表public整个目录下的html文件，数组时可指定文件，如['/contact/index.html']   |
-| scss        | [{entry,outDir}]    | 需要编译的单独scss文件。专为单独纯html页面量身定制，可将独立(即没有在项目里引入)的scss转换为css                |
+| 参数          | 类型                   | 说明                                                                      |
+|-------------|----------------------|-------------------------------------------------------------------------|
+| puppeteer   | object               | puppeteer一些配置                                                           |
+| routes      | string[]             | 生成预渲染的路由path                                                            |
+| network     | boolean              | 构建时是否获取异步数据并注入到预渲染的 HTML 文件中，默认false 。开启后构建速度相对会慢些                      |
+| removeStyle | boolean              | 移除预览服务生成多余样式，默认true。如样式丢失，可设置为false                                     |
+| callback    | function(html,route) | 预渲染和处理public下.html文件处理回调事件，可对需处理的页面进行修改，html为将要生成的文件内容,route当前处理的页面path |
+| publicHtml  | boolean/string[]     | 需要处理的纯静态文件。true代表public整个目录下的html文件，数组时可指定文件，如['/contact/index.html']   |
+| scss        | [{entry,outDir}]     | 需要编译的单独scss文件。专为单独纯html页面量身定制，可将独立(即没有在项目里引入)的scss转换为css                |
 
 
 ## 附：seo关键词优化路由设置
