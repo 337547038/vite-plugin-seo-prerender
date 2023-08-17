@@ -19,7 +19,8 @@ export interface Config {
   removeStyle?: boolean // 启用vite preview会自带有些样式，默认下移除
   callback?: Function
   publicHtml?: boolean | string[] // public目录html文件处理
-  scss?: Scss[]
+  scss?: Scss[],
+  hashHistory?:boolean // 路由模式，使用hash模式时需设置为true
 }
 
 const getPublicHtml = (publicHtml: boolean | string[]) => {

@@ -13,7 +13,14 @@ const seoPrerender = async (config: any) => {
     network = {waitUntil: 'networkidle0'} // 等待所有请求结束
   }
   for (const item of config.routes) {
-    await page.goto(path.join(config.local, item), network)
+    //console.log('path', path.join(config.local, item))
+    //console.log('path2', config.local, item)
+    let pageUrl: string = config.local + item
+    if (config.hashHistory) {
+      pageUrl = `${config.local}/#${item}`
+    }
+    console.log('pageurl',pageUrl)
+    await page.goto(pageUrl, network)
     await page.setViewport({width: 1024, height: 768})
     let content: string = await page.content()
     if (config.removeStyle !== false) {
