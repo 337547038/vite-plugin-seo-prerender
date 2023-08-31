@@ -3,6 +3,9 @@ import fs from 'fs'
 import path from 'path'
 import {recursiveMkdir} from './utils'
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const seoPrerender = async (config: any) => {
   const browser = await puppeteer.launch(Object.assign({headless: 'new'}, config.puppeteer || {}));
@@ -19,9 +22,11 @@ const seoPrerender = async (config: any) => {
     if (config.hashHistory) {
       pageUrl = `${config.local}/#${item}`
     }
-    console.log('pageurl',pageUrl)
+    //console.log('pageurl',pageUrl)
     await page.goto(pageUrl, network)
     await page.setViewport({width: 1024, height: 768})
+    await page.waitForSelector('body')
+    await delay(config.delay||500)
     let content: string = await page.content()
     if (config.removeStyle !== false) {
       // 若出现导常，可设置参数removeStyle:false
@@ -43,6 +48,7 @@ const seoPrerender = async (config: any) => {
       recursiveMkdir(fullPath)
       const filePath = path.join(fullPath, 'index.html')
       fs.writeFileSync(filePath, content)
+      //console.log(content)
       console.log(`${logTip} ${filePath.replace(/\\/g, '/')} is success!`)
     }
   }

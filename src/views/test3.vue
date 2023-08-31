@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    this is test page
+    this is test3 page
     <div v-for="(item,index) in list" :key="index">
       <p>{{item.name}}</p>
     </div>
@@ -9,9 +9,8 @@
 </template>
 <script setup>
   import {ref, onMounted} from 'vue'
-  import axios from 'axios'
   
-  const list=ref([{name:'1'}])
+  const list=ref([{name:'test33333'},{name:'test3 test3'}])
   
   onMounted(() => {
   

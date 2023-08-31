@@ -8,8 +8,8 @@ export default defineConfig({
   plugins: [
     vue(),
     seoPrerender({
-      hashHistory:true,
-      routes: ['/about'],
+      hashHistory:true,　// 使用hash路由，需设置为true
+      routes: ['/about', '/test', '/test1','/test2','/test3'],
       /*publicHtml: true,
       scss: [
         {entry: '/src/assets/test.scss', outDir: '/public/style/test.css'}
