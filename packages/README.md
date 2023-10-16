@@ -72,6 +72,7 @@ export default defineConfig({
 | publicHtml  | boolean/string[]     | 需要处理的纯静态文件。true代表public整个目录下的html文件，数组时可指定文件，如['/contact/index.html']   |
 | scss        | [{entry,outDir}]     | 需要编译的单独scss文件。专为单独纯html页面量身定制，可将独立(即没有在项目里引入)的scss转换为css                |
 | hashHistory | boolean              | 路由模式为hashHistory时需设置为true                                               |
+| delay       | number               | 延时等待时间，确保页面加载完成                                                         |
 
 
 ## 附：seo关键词优化路由设置

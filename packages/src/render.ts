@@ -26,7 +26,9 @@ const seoPrerender = async (config: any) => {
     await page.goto(pageUrl, network)
     await page.setViewport({width: 1024, height: 768})
     await page.waitForSelector('body')
-    await delay(config.delay||500)
+    if(config.delay){
+     await delay(config.delay)
+    }
     let content: string = await page.content()
     if (config.removeStyle !== false) {
       // 若出现导常，可设置参数removeStyle:false

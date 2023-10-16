@@ -54,17 +54,22 @@ const seoPrerender = (config: Config) => {
     mode: '',
     root: '',
     local: '',
-    base: ''
+    base: '',
+    isProduction:false,
+    command:''
   }
   const configPublicHtml = config.publicHtml || false
   return {
     name: 'vitePluginSeoPrerender',
     enforce: 'post',
     configResolved(cfg: any) {
+     //console.log('cfg',cfg)
       cfgConfig.outDir = cfg.build.outDir
       cfgConfig.mode = cfg.mode
       cfgConfig.root = cfg.root
       cfgConfig.base = cfg.base
+      cfgConfig.isProduction=cfg.isProduction
+      cfgConfig.command=cfg.command
     },
     buildStart() {
       if (config?.scss?.length) {
@@ -119,7 +124,8 @@ const seoPrerender = (config: Config) => {
     },
     async closeBundle() {
       // vite build 构建生产环境时才执行
-      if (cfgConfig.mode !== 'production') {
+      //console.log('cfgConfig',cfgConfig)
+      if (!cfgConfig.isProduction) {
         return
       }
       // 处理public下的html
