@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer'
 import fs from 'fs'
 import path from 'path'
 import {recursiveMkdir} from './utils'
+import {URL} from 'url'
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -15,14 +16,14 @@ const seoPrerender = async (config: any) => {
   if (config.network) {
     network = {waitUntil: 'networkidle0'} // 等待所有请求结束
   }
+  const href:string = new URL(config.base,config.local).toString().slice(0, -1) // 去掉最后一个/
   for (const item of config.routes) {
     //console.log('path', path.join(config.local, item))
     //console.log('path2', config.local, item)
-    let pageUrl: string = config.local + item
+    let pageUrl: string = href + item
     if (config.hashHistory) {
-      pageUrl = `${config.local}/#${item}`
+      pageUrl = `${href}/#${item}`
     }
-    //console.log('pageurl',pageUrl)
     await page.goto(pageUrl, network)
     await page.setViewport({width: 1024, height: 768})
     await page.waitForSelector('body')
@@ -51,7 +52,7 @@ const seoPrerender = async (config: any) => {
       const filePath = path.join(fullPath, 'index.html')
       fs.writeFileSync(filePath, content)
       //console.log(content)
-      console.log(`${logTip} ${filePath.replace(/\\/g, '/')} is success!`)
+      console.log(`${logTip} ${pageUrl.replace(config.local,'')} => ${filePath.replace(/\\/g, '/')} is success!`)
     }
   }
   await browser.close();

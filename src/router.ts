@@ -56,8 +56,8 @@ const routes = [
 // console.log(routes)
 // 配置路由
 const router = createRouter({
- //history: createWebHistory(),
-  history: createWebHashHistory(),
+ //history: createWebHistory('/abc/'),
+  history: createWebHashHistory('/abc/'),
   routes: routes
 })
 
