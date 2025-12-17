@@ -1,3 +1,4 @@
+import type { Plugin } from 'vite'
 import childProcess from 'child_process'
 import path from 'path'
 import fs from 'fs'
@@ -14,14 +15,26 @@ interface Scss {
 }
 
 export interface Config {
-  puppeteer?: any // puppeteer一些配置
-  routes?: string[] // 需要生成的路由地址
-  removeStyle?: boolean // 启用vite preview会自带有些样式，默认下移除
-  callback?: Function
-  publicHtml?: boolean | string[] // public目录html文件处理
-  scss?: Scss[],
-  hashHistory?:boolean // 路由模式，使用hash模式时需设置为true
-  delay?:number // 延时等待时间，默认500ms。确保页面加载完成
+  /** 生成预渲染的路由path */
+  routes: string[]
+  /** puppeteer一些配置 */
+  puppeteer?: any;
+  /** 构建时是否获取异步数据并注入到预渲染的 HTML 文件中，默认false 。开启后构建速度相对会慢些 */
+  network?: boolean
+  /** 移除预览服务生成多余样式，默认true。如样式丢失，可设置为false */
+  removeStyle?: boolean
+  /** 预渲染和处理public下.html文件处理回调事件，可对需处理的页面进行修改，html为将要生成的文件内容,route当前处理的页面path */
+  callback?: (html: string, route: string) => string
+  /** 需要处理的其他纯静态文件。true代表public整个目录下的html文件，数组时可指定文件，如['/contact/index.html'] */
+  publicHtml?: boolean | string[]
+  /** 需要编译的单独scss文件。专为单独纯html页面量身定制，可将独立(即没有在项目里引入)的scss转换为css */
+  scss?: { entry: string; outDir: string }[]
+  /** 路由模式为hashHistory时需设置为true */
+  hashHistory?: boolean
+  /** 延时等待时间，确保页面加载完成 */
+  delay?: number
+  /** 并行处理数量。默认为 1，即不并行处理 */
+  concurrency?: number
 }
 
 const getPublicHtml = (publicHtml: boolean | string[]) => {
@@ -167,9 +180,7 @@ const seoPrerender = (config: Config) => {
         }
       })
     }
-  }
+  } as Plugin
 }
 
 export default seoPrerender
-
-

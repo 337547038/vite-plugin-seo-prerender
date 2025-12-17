@@ -73,6 +73,7 @@ export default defineConfig({
 | scss        | [{entry,outDir}]     | 需要编译的单独scss文件。专为单独纯html页面量身定制，可将独立(即没有在项目里引入)的scss转换为css                |
 | hashHistory | boolean              | 路由模式为hashHistory时需设置为true                                               |
 | delay       | number               | 延时等待时间，确保页面加载完成                                                         |
+| concurrency | number               | 并发处理数量，默认为 1，可根据机器性能适当调整                                          |
 
 
 ## 附：seo关键词优化路由设置
