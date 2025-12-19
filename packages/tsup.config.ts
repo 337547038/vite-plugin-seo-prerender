@@ -13,7 +13,7 @@ export default defineConfig(() => {
     minify: true,
     sourcemap: false,
     clean: true,
-    dts: false,
+    dts: true,
     define: {
       'process.env.NODE_ENV': '"production"',
       __TEST__: 'false',
