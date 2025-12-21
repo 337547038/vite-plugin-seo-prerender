@@ -5,7 +5,7 @@ import {recursiveMkdir} from './utils'
 import {URL} from 'url'
 import type { Config } from './index'
 
-function delay(ms) {
+function delay(ms:any) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
