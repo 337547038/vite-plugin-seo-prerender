@@ -26,3 +26,25 @@ export const recursiveMkdir = (dirPath:string) => {
     fs.mkdirSync(dirPath) // 创建当前目录
   }
 }
+
+export function concurrency<T, E = T | Error>(taskList: (() => Promise<T>)[], maxDegreeOfParalellism = 5) {
+  const total = taskList.length;
+  let idx = 0;
+  const resut: { index: number; result: T; error: E }[] = [];
+  const onFinish = (index: number, result: T, error?: E) => {
+    resut.push({ index, result, error: error as never });
+    return next();
+  };
+  const next = (): Promise<void> => {
+    if (idx >= total) return Promise.resolve();
+    const index = idx++;
+    return taskList[index]()
+      .then(r => onFinish(index, r))
+      .catch(error => onFinish(index, null as never as T, error));
+  };
+  const size = Math.max(1, Math.min(maxDegreeOfParalellism, total));
+  const queue: Promise<void>[] = [];
+  for (let i = 0; i < size; i++) queue.push(next());
+
+  return Promise.allSettled(queue).then(() => resut.sort((a, b) => a.index - b.index));
+}

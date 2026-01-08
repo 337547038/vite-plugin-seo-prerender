@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer'
 import fs from 'fs'
 import path from 'path'
-import {recursiveMkdir} from './utils'
+import {recursiveMkdir, concurrency as concurrencyFn } from './utils'
 import {URL} from 'url'
 import type { Config } from './index'
 
@@ -29,15 +29,9 @@ const seoPrerender = async (config: PrenderConfig) => {
   const href:string = new URL(config.base,config.local).toString().slice(0, -1) // 去掉最后一个/
   
   // 设置并发数，默认为1，应注意避免同时打开过多页面导致内存问题
-  const concurrency = Math.max(1, Number(config.concurrency || 1));
-  console.log(`${logTip} 开始预渲染，并发数: ${concurrency}`);
-  
-  // 将路由分组
-  const routeGroups: string[][] = [];
-  for (let i = 0; i < config.routes.length; i += concurrency) {
-    routeGroups.push(config.routes.slice(i, i + concurrency));
-  }
-  
+  const total = config.routes.length
+  let current = 0
+
   // 处理单个路由
   const processRoute = async (item: string) => {
     const page = await browser.newPage();
@@ -74,17 +68,18 @@ const seoPrerender = async (config: PrenderConfig) => {
         const filePath = path.join(fullPath, 'index.html')
         fs.writeFileSync(filePath, content)
         //console.log(content)
-        console.log(`${logTip} ${pageUrl.replace(config.local,'')} => ${filePath.replace(/\\/g, '/')} is success!`)
+        console.log(`[${current++}/${total}]${logTip} ${pageUrl.replace(config.local,'')} => ${filePath.replace(/\\/g, '/')} is success!`)
       }
     } finally {
       await page.close();
     }
   };
 
-  // 分组并发处理路由
-  for (const group of routeGroups) {
-    await Promise.all(group.map(item => processRoute(item)));
-  }
+  const taskList = config.routes.map(item => () => processRoute(item));
+  const concurrency = Math.min(Math.max(1, Number(config.concurrency || 1)), total);
+
+  console.log(`${logTip} 开始预渲染，并发数: ${concurrency}`);
+  await concurrencyFn(taskList, concurrency);
 
   await browser.close();
   console.log(`${logTip} is complete`)
