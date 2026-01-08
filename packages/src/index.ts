@@ -172,7 +172,7 @@ const seoPrerender = (config: Config) => {
           localUrl = local[0].replace(/\x1B\[\d+m/g, '').slice(0, -1) // 控制台输出的有些会经过转义
           console.log('Local: ' + localUrl)
           cfgConfig.local = localUrl
-          await prerender(Object.assign(config, cfgConfig))
+          await prerender(Object.assign(cfgConfig,config))
           // 在某个条件满足时，关闭进程退出
           cProcess.kill('SIGTERM')
           process.exit() // 关闭当前进程并退出
